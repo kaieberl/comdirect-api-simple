@@ -2,6 +2,20 @@ from typing import Any
 
 
 class AccountService:
+    def get_accounts(self, without_account: bool = False) -> Any:
+        """4.1.0. Request for account information for all accounts.
+
+        Args:
+            without_account (bool, optional): Suppresses the master data of the accounts. Defaults to False.
+
+        Returns:
+            Any: Response object
+        """
+        url = "{0}/banking/clients/user/v2/accounts".format(self.api_url)
+        params = {"without-attr": "account"} if without_account else None
+        response = self.session.get(url, params=params).json()
+        return response
+
     def get_all_balances(self, without_account: bool = False) -> Any:
         """4.1.1. Request for account information, including cash balance and buying power, for all accounts.
 

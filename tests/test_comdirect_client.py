@@ -3,6 +3,24 @@ import os
 from comdirect_api.comdirect_client import ComdirectClient
 
 
+class DummyResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def json(self):
+        return self.payload
+
+
+class DummySession:
+    def __init__(self, payload):
+        self.payload = payload
+        self.requests = []
+
+    def get(self, url, params=None):
+        self.requests.append((url, params))
+        return DummyResponse(self.payload)
+
+
 def test_comdirect_client_fresh_init():
     client_id = "dummy_id"
     client_secret = "dummy_secret"
@@ -37,3 +55,32 @@ def test_comdirect_client_import_session(tmp_path):
 
     assert new_client.auth_service.client_id == client_id
     assert new_client.auth_service.client_secret == client_secret
+
+
+def test_get_accounts():
+    client = ComdirectClient("dummy_id", "dummy_secret")
+    payload = {"values": [{"accountId": "account-id"}]}
+    client.session = DummySession(payload)
+
+    response = client.get_accounts()
+
+    assert response == payload
+    assert client.session.requests == [
+        ("https://api.comdirect.de/api/banking/clients/user/v2/accounts", None)
+    ]
+
+
+def test_get_accounts_without_account():
+    client = ComdirectClient("dummy_id", "dummy_secret")
+    payload = {"values": []}
+    client.session = DummySession(payload)
+
+    response = client.get_accounts(without_account=True)
+
+    assert response == payload
+    assert client.session.requests == [
+        (
+            "https://api.comdirect.de/api/banking/clients/user/v2/accounts",
+            {"without-attr": "account"},
+        )
+    ]

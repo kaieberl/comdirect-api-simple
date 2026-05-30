@@ -4,7 +4,7 @@ This is an unofficial python wrapper for the comdirect API for private consumers
 
 This package currently supports the following operations:
 
-* Read balances and transactions
+* Read account information, balances and transactions
 * Read depot information
 * Read and download Documents
 * Read and update orders
@@ -57,6 +57,13 @@ The the client is now ready for use, for example:
 ```python
 balances = client.get_all_balances()
 print(balances['values'])
+```
+
+You can fetch account master data separately:
+
+```python
+accounts = client.get_accounts()
+print(accounts['values'])
 ```
 
 It is also possible to send a GET request to a self defined endpoint, for example:
